@@ -1,0 +1,4 @@
+Import map
+
+- Клиенты.xlsx -> AppUsers(CLIENT), EventOrders
+- Менеджеры.xlsx -> AppUsers(MANAGER)

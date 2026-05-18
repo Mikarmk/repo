@@ -1,0 +1,8 @@
+Setup guide
+
+1. Выполнить database/01_create_database.sql для БД `OnlineCoursesDemo`.
+2. Выполнить database/02_import_staging.sql.
+3. Выполнить database/03_normalize_and_seed.sql.
+4. Открыть проект из src в Visual Studio.
+5. Исправить App.config, если SQL Server установлен не по `localhost\SQLEXPRESS`.
+6. Запустить LoginWindow.

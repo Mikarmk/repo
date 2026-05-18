@@ -1,0 +1,3 @@
+Import map
+
+- Импорт.xlsx -> Parents, Students, Courses, Enrollments

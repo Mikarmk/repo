@@ -1,0 +1,16 @@
+System programmer guide
+
+- Назначение: учет заявок на ремонт бытовой техники.
+- Клиентское ПО: WPF `.NET Framework 4.8`.
+- Подключение к БД: `App.config` -> `connectionStrings` -> `AppDb`.
+- Драйвер доступа к БД: `System.Data.SqlClient`.
+- Порядок развертывания:
+  1. Выполнить SQL-скрипты из `database`.
+  2. Проверить наличие базы `BytServiceDemo`.
+  3. Проверить строку подключения.
+  4. Запустить `BytService.App`.
+- Если приложение не стартует:
+  1. Проверить доступность SQL Server.
+  2. Проверить таблицы `Users`, `RepairRequests`, `RequestStatuses`.
+  3. Проверить права текущего пользователя БД.
+  4. Проверить, что `FeedbackUrl` задан в `App.config`.

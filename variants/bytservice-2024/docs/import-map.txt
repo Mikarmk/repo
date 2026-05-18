@@ -1,0 +1,6 @@
+Import map
+
+- `inputDataUsers.*` -> `Roles`, `Users`
+- `inputDataRequests.*` -> `RepairRequests`, `RequestStatusHistory`
+- `inputDataComments.*` -> `RequestComments`
+- `Прил_3` business rules -> `RequestAssistantMasters`, `ExtendedUntil`, `QualityManagerId`, `ExtensionApprovedByClient`

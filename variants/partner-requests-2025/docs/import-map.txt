@@ -1,0 +1,3 @@
+Import map
+
+- import resources -> Partners, Products, PartnerRequests, PartnerRequestItems

@@ -1,0 +1,7 @@
+Import map
+
+- Заказы_import.xlsx -> Orders
+- Кладовщики.xlsx -> AppUsers(STOREKEEPER)
+- Менеджеры.xlsx -> AppUsers(MANAGER)
+- Покупатели физические -> Buyers retail
+- Покупатели юр.лица -> Buyers wholesale

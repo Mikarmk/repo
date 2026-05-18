@@ -1,0 +1,9 @@
+Setup guide
+
+1. Выполнить `database/01_create_database.sql`.
+2. Выполнить `database/02_import_staging.sql`.
+3. Выполнить `database/03_normalize_and_seed.sql`.
+4. При необходимости выполнить `database/04_reports.sql`, `database/05_security.sql`, `database/06_backup.sql`.
+5. Открыть `src/BytService.App/BytService.App.csproj` в Visual Studio.
+6. Проверить строку подключения `AppDb` в `App.config`.
+7. Запустить приложение и войти тестовыми учетными записями из README.

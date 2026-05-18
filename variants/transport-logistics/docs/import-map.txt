@@ -1,0 +1,8 @@
+Import map
+
+- Заказы_import.xlsx -> Orders
+- Менеджеры.xlsx -> AppUsers(MANAGER)
+- перевозчики.xlsx -> Carriers
+- Водители.xlsx -> Drivers
+- Потребители.xlsx -> Consumers
+- Производители.xlsx -> Manufacturers

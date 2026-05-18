@@ -1,0 +1,7 @@
+Import map
+
+- Partners_import.xlsx -> PartnerTypes, Partners
+- Product_type_import.xlsx -> ProductTypes
+- Products_import.xlsx -> Products
+- Material_type_import.xlsx -> MaterialTypes
+- Partner_products_request_import.xlsx -> PartnerRequests, PartnerRequestItems

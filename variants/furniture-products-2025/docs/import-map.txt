@@ -1,0 +1,3 @@
+Import map
+
+- import resources -> Products, ProductTypes, Workshops, Materials

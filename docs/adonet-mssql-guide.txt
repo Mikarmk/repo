@@ -1,0 +1,83 @@
+ADO.NET + MSSQL guide
+
+1. Что нужно на экзамене
+   - SQL Server или SQL Server Express.
+   - Visual Studio с .NET desktop development.
+   - Строка подключения к серверу.
+
+2. Где менять строку подключения
+   - В WPF-проектах используется файл App.config.
+   - Ищите секцию connectionStrings.
+
+3. Примеры строк подключения
+
+   Windows Authentication:
+   Data Source=localhost\SQLEXPRESS;Initial Catalog=TransportLogisticsDemo;Integrated Security=True;TrustServerCertificate=True
+
+   SQL Login:
+   Data Source=localhost;Initial Catalog=TransportLogisticsDemo;User ID=sa;Password=YourStrongPassword;TrustServerCertificate=True
+
+4. Базовый код подключения
+
+   using System.Data.SqlClient;
+
+   var connectionString = ConfigurationManager.ConnectionStrings["AppDb"].ConnectionString;
+
+   using (var connection = new SqlConnection(connectionString))
+   {
+       connection.Open();
+   }
+
+5. Как выполнять SELECT
+
+   using (var connection = new SqlConnection(connectionString))
+   using (var command = new SqlCommand("SELECT Login, FullName FROM dbo.AppUsers", connection))
+   {
+       connection.Open();
+
+       using (var reader = command.ExecuteReader())
+       {
+           while (reader.Read())
+           {
+               var login = reader.GetString(0);
+               var fullName = reader.GetString(1);
+           }
+       }
+   }
+
+6. Как выполнять INSERT/UPDATE через параметры
+
+   using (var connection = new SqlConnection(connectionString))
+   using (var command = new SqlCommand(
+       "INSERT INTO dbo.AppUsers (Login, PasswordHash, FullName, RoleId) VALUES (@Login, @PasswordHash, @FullName, @RoleId)",
+       connection))
+   {
+       command.Parameters.AddWithValue("@Login", login);
+       command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+       command.Parameters.AddWithValue("@FullName", fullName);
+       command.Parameters.AddWithValue("@RoleId", roleId);
+
+       connection.Open();
+       command.ExecuteNonQuery();
+   }
+
+7. Что обязательно объяснить на защите
+   - Почему используются параметризованные запросы.
+   - Где хранится строка подключения.
+   - Как открывается SqlConnection.
+   - Чем ExecuteReader отличается от ExecuteNonQuery.
+   - Как обрабатываются исключения SqlException.
+
+8. Частые проблемы
+   - Неверное имя сервера.
+   - База еще не создана.
+   - В строке подключения нет TrustServerCertificate=True.
+   - Неверный логин SQL Server.
+   - Приложение смотрит в другую БД, чем выполнялись SQL-скрипты.
+
+9. Минимальная схема запуска
+   - Выполнить 01_create_database.sql.
+   - Выполнить 02_import_staging.sql.
+   - Выполнить 03_normalize_and_seed.sql.
+   - Проверить вход тестовой учетной записью.
+   - Запустить приложение и проверить загрузку главного списка.
