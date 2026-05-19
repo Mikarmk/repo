@@ -81,3 +81,111 @@ ADO.NET + MSSQL guide
    - Выполнить 03_normalize_and_seed.sql.
    - Проверить вход тестовой учетной записью.
    - Запустить приложение и проверить загрузку главного списка.
+
+10. Если работа идет через Entity Framework
+
+Это уже не ручной `SqlConnection`, а работа через контекст БД, например:
+
+   DemoTestEntities db = new DemoTestEntities();
+
+Обычно это `Entity Framework Database First`.
+
+Пример загрузки таблицы в DataGrid:
+
+   DemoTestEntities db = new DemoTestEntities();
+
+   public AdminWindow()
+   {
+       InitializeComponent();
+       DataGridUsers.ItemsSource = db.Users.ToList();
+   }
+
+Пример авторизации:
+
+   private void LoginBTN_Click(object sender, RoutedEventArgs e)
+   {
+       string login = LoginBox.Text;
+       string password = PasswordBox.Password;
+
+       using (var db = new DemoTestEntities())
+       {
+           var user = db.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
+
+           if (user == null)
+           {
+               MessageBox.Show("Пользователь не найден");
+               return;
+           }
+
+           MessageBox.Show("Добро пожаловать, " + user.Fio);
+
+           if (user.RolID == 1)
+           {
+               new AdminWindow().Show();
+               Close();
+               return;
+           }
+
+           if (user.RolID == 2)
+           {
+               new UserWindow().Show();
+               Close();
+               return;
+           }
+
+           MessageBox.Show("Роль пользователя не определена");
+       }
+   }
+
+Пример сохранения из DataGrid:
+
+   private void SaveBTN_Click(object sender, RoutedEventArgs e)
+   {
+       UsersGrid.CommitEdit();
+       db.SaveChanges();
+       MessageBox.Show("Изменения сохранены");
+   }
+
+Пример добавления:
+
+   private void AddBTN_Click(object sender, RoutedEventArgs e)
+   {
+       Users user = new Users
+       {
+           Login = LoginTB.Text,
+           Password = PasswordTB.Text,
+           Fio = FioTB.Text,
+           RolID = 2
+       };
+
+       db.Users.Add(user);
+       db.SaveChanges();
+       MessageBox.Show("Пользователь добавлен");
+   }
+
+Пример удаления:
+
+   private void DeleteBTN_Click(object sender, RoutedEventArgs e)
+   {
+       Users selectedUser = UsersGrid.SelectedItem as Users;
+
+       if (selectedUser == null)
+       {
+           MessageBox.Show("Выберите пользователя");
+           return;
+       }
+
+       db.Users.Remove(selectedUser);
+       db.SaveChanges();
+       MessageBox.Show("Пользователь удален");
+   }
+
+11. Что говорить на защите, если работаешь через Entity Framework
+
+   - `DemoTestEntities` это контекст базы данных.
+   - `db.Users` это отображение таблицы `Users`.
+   - `ToList()` загружает список строк.
+   - `FirstOrDefault()` возвращает первую найденную запись или `null`.
+   - `Add()` добавляет запись в контекст.
+   - `Remove()` удаляет запись из контекста.
+   - `SaveChanges()` сохраняет изменения в базе данных.

@@ -35,6 +35,20 @@
 6. Открыть solution или `.csproj` из `src`.
 7. Настроить строку подключения по [docs/adonet-mssql-guide.txt](/Users/murat/Desktop/Демо экзамены/repo/docs/adonet-mssql-guide.txt).
 
+## Работа с БД
+
+В репозитории теперь есть два вида примеров:
+
+- `ADO.NET` через `SqlConnection`, `SqlCommand`, `SqlDataReader`
+- `Entity Framework` / `Database First` через `DemoTestEntities`, `db.Users.ToList()`, `FirstOrDefault()`, `SaveChanges()`
+
+Полезные файлы:
+
+- [adonet-mssql-guide.txt](/Users/murat/Desktop/Демо экзамены/repo/docs/adonet-mssql-guide.txt)
+- [exam-cheatsheet-print.txt](/Users/murat/Desktop/Демо экзамены/repo/docs/exam-cheatsheet-print.txt)
+- [EF-WPF-cheatsheet-print.docx](/Users/murat/Desktop/Демо экзамены/repo/docs/EF-WPF-cheatsheet-print.docx)
+- [EF-WPF-concrete-examples.docx](/Users/murat/Desktop/Демо экзамены/repo/docs/EF-WPF-concrete-examples.docx)
+
 ## Статус
 
 Наиболее полный прикладной пример в репозитории сейчас: `variants/bytservice-2024`.

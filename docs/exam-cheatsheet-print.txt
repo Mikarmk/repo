@@ -1,0 +1,328 @@
+DEMO EXAM CHEATSHEET
+
+1. ПОРЯДОК РАБОТЫ
+
+1. Сделать БД и таблицы.
+2. Импортировать данные.
+3. Проверить SELECT на главную таблицу.
+4. Подключить WPF к БД через ADO.NET.
+5. Сделать авторизацию.
+6. Сделать главное окно со списком.
+7. Сделать добавление/редактирование.
+8. Сделать поиск.
+9. Сделать роли, если нужны по заданию.
+10. Сделать обработку ошибок.
+11. Проверить сценарии руками.
+12. Сдать SQL + проект + текстовые гайды.
+
+2. ЧТО ДОЛЖНО БЫТЬ В WPF ПОЧТИ ВСЕГДА
+
+- LoginWindow
+- MainWindow
+- ProfileWindow или блок профиля
+- RecordDialog / AddEditWindow
+- Кнопки: Добавить, Редактировать, Обновить, Назад
+- Поиск в реальном времени
+- MessageBox для ошибок, предупреждений, подтверждений
+- Заголовок окна
+- Иконка/логотип, если есть в ресурсах
+
+3. APP.CONFIG
+
+connectionStrings:
+Data Source=localhost\SQLEXPRESS;Initial Catalog=MyDemoDb;Integrated Security=True;TrustServerCertificate=True
+
+Если SQL-аутентификация:
+Data Source=localhost;Initial Catalog=MyDemoDb;User ID=sa;Password=123;TrustServerCertificate=True
+
+4. ADO.NET МИНИМУМ
+
+using System.Data.SqlClient;
+using System.Configuration;
+
+var connectionString = ConfigurationManager.ConnectionStrings["AppDb"].ConnectionString;
+
+using (var connection = new SqlConnection(connectionString))
+{
+    connection.Open();
+}
+
+SELECT:
+using (var command = new SqlCommand("SELECT * FROM dbo.AppUsers", connection))
+using (var reader = command.ExecuteReader())
+{
+    while (reader.Read())
+    {
+    }
+}
+
+INSERT / UPDATE:
+using (var command = new SqlCommand("INSERT INTO dbo.AppUsers(Login, PasswordHash) VALUES(@Login, @PasswordHash)", connection))
+{
+    command.Parameters.AddWithValue("@Login", login);
+    command.Parameters.AddWithValue("@PasswordHash", password);
+    command.ExecuteNonQuery();
+}
+
+4.1 ЕСЛИ РАБОТАЕШЬ ЧЕРЕЗ ENTITY FRAMEWORK
+
+Твой стиль работы выглядит так:
+
+using (var db = new DemoTestEntities())
+{
+    var user = db.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
+}
+
+Что это значит:
+- это не ADO.NET вручную
+- это Entity Framework
+- чаще всего Database First
+- подключение идет через `.edmx` и строку подключения в `App.config`
+
+Минимальный шаблон авторизации через EF:
+
+using (var db = new DemoTestEntities())
+{
+    var user = db.Users.FirstOrDefault(x => x.Login == login && x.Password == password);
+
+    if (user == null)
+    {
+        MessageBox.Show("Пользователь не найден");
+        return;
+    }
+
+    if (user.RolID == 1)
+    {
+        MessageBox.Show("Добро пожаловать, " + user.Fio);
+        new AdminWindow().Show();
+        Close();
+        return;
+    }
+
+    if (user.RolID == 2)
+    {
+        MessageBox.Show("Добро пожаловать, " + user.Fio);
+        new UserWindow().Show();
+        Close();
+        return;
+    }
+
+    MessageBox.Show("Роль пользователя не определена");
+}
+
+Что помнить для EF:
+- `DemoTestEntities` = контекст базы
+- `db.Users` = таблица Users
+- `FirstOrDefault()` = взять первую запись или null
+- `Include()` = если нужно подтянуть связанные таблицы
+- `SaveChanges()` = сохранить изменения в БД
+
+Пример добавления через EF:
+
+using (var db = new DemoTestEntities())
+{
+    var user = new Users
+    {
+        Login = "test",
+        Password = "123",
+        Fio = "Тестовый пользователь",
+        RolID = 2
+    };
+
+    db.Users.Add(user);
+    db.SaveChanges();
+}
+
+Пример редактирования через EF:
+
+using (var db = new DemoTestEntities())
+{
+    var user = db.Users.FirstOrDefault(x => x.ID == id);
+    if (user == null)
+    {
+        MessageBox.Show("Запись не найдена");
+        return;
+    }
+
+    user.Fio = FioBox.Text;
+    user.Login = LoginBox.Text;
+    db.SaveChanges();
+}
+
+Пример удаления через EF:
+
+using (var db = new DemoTestEntities())
+{
+    var user = db.Users.FirstOrDefault(x => x.ID == id);
+    if (user == null)
+    {
+        MessageBox.Show("Запись не найдена");
+        return;
+    }
+
+    db.Users.Remove(user);
+    db.SaveChanges();
+}
+
+5. ЧТО ГОВОРИТЬ ПРО ADO.NET
+
+- SqlConnection открывает соединение.
+- SqlCommand выполняет запрос.
+- SqlDataReader читает строки SELECT.
+- ExecuteReader = чтение данных.
+- ExecuteNonQuery = INSERT / UPDATE / DELETE.
+- Параметры нужны для защиты от SQL Injection.
+
+6. АВТОРИЗАЦИЯ
+
+Обычно логика такая:
+
+SELECT TOP 1 UserId, Login, FullName, RoleId
+FROM dbo.AppUsers
+WHERE Login = @Login
+  AND PasswordHash = @PasswordHash
+  AND IsActive = 1
+
+Если запись есть:
+- открыть главное окно
+- передать currentUser
+
+Если записи нет:
+- показать MessageBox "Неверный логин или пароль"
+
+Если работаешь через EF:
+- `db.Users.FirstOrDefault(...)`
+- дальше проверка `user == null`
+- потом переход по `RolID`
+
+7. CAPTCHA И БЛОКИРОВКА
+
+Если это есть в задании:
+
+- 1 ошибка: просто сообщение
+- 2 ошибка: показать CAPTCHA
+- 3 ошибка: блокировка на 10 секунд
+
+Что помнить:
+- CAPTCHA = 5 символов
+- можно сделать TextBlock + случайная строка + символы шума
+- блокировка делается через DispatcherTimer
+
+8. ПОИСК В РЕАЛЬНОМ ВРЕМЕНИ
+
+Самый простой вариант:
+
+- TextBox TextChanged
+- заново загрузить список
+- WHERE Name LIKE '%' + @Search + '%'
+
+Пример:
+WHERE @Search = N'' OR Title LIKE N'%' + @Search + N'%'
+
+9. MESSAGEBOX, КОТОРЫЕ НУЖНЫ ПОЧТИ ВСЕГДА
+
+Ошибка:
+MessageBox.Show("Ошибка подключения к базе данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+Предупреждение:
+MessageBox.Show("Сначала выберите запись.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+Подтверждение удаления:
+var result = MessageBox.Show("Удалить запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+10. ЧТО ДЕЛАТЬ В ГЛАВНОМ ОКНЕ
+
+- загрузить список из БД
+- вывести DataGrid
+- кнопка Добавить
+- кнопка Редактировать
+- кнопка Обновить
+- поиск
+- показать роль текущего пользователя
+
+11. ЧТО ДЕЛАТЬ В ФОРМЕ ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ
+
+- если Add: поля пустые
+- если Edit: загрузить выбранную запись
+- Validate()
+- Save()
+- закрыть окно с DialogResult = true
+- в MainWindow заново Reload()
+
+12. ВАЛИДАЦИЯ
+
+Проверять:
+
+- пустые обязательные поля
+- число >= 0
+- рейтинг целый и неотрицательный
+- цена >= 0
+- количество > 0
+- дата заполнена
+- email/телефон хотя бы не пустые, если нужны по заданию
+
+13. SQL-ОТЧЕТЫ, КОТОРЫЕ МОЖНО БЫСТРО СДЕЛАТЬ
+
+Количество:
+SELECT StatusName, COUNT(*) FROM dbo.Orders GROUP BY StatusName;
+
+Среднее:
+SELECT AVG(CAST(TransitDays AS decimal(18,2))) FROM dbo.Orders;
+
+Сумма:
+SELECT SUM(Quantity * UnitPrice) FROM dbo.OrderItems;
+
+TOP:
+SELECT TOP (10) Name, Price FROM dbo.Products ORDER BY Price DESC;
+
+14. ЧТО СПРАШИВАЮТ НА ЗАЩИТЕ
+
+- почему такая ER
+- почему 3НФ
+- что за первичные и внешние ключи
+- как подключили БД
+- почему параметры в SQL
+- как реализована авторизация
+- как реализован поиск
+- как реализована обработка ошибок
+- как реализована роль пользователя
+
+15. МИНИ-ЧЕКЛИСТ ПЕРЕД СДАЧЕЙ
+
+- SQL-скрипт запускается без красных ошибок
+- БД создается
+- таблицы созданы
+- данные загружены
+- приложение открывается
+- вход работает
+- список загружается
+- добавить/изменить работает
+- поиск работает
+- MessageBox есть
+- заголовки окон есть
+- иконка/логотип подключены, если были
+- txt/md гайд приложен
+
+16. ЕСЛИ ВРЕМЕНИ МАЛО
+
+Делать в таком приоритете:
+
+1. БД
+2. импорт
+3. авторизация
+4. главное окно со списком
+5. добавление/редактирование
+6. поиск
+7. роли
+8. CAPTCHA / отчеты / украшения
+
+17. ГЛАВНАЯ МЫСЛЬ
+
+На экзамене лучше простое, но рабочее решение:
+
+- без ORM
+- без сложной архитектуры
+- с понятным SQL
+- с понятным WPF
+- с рабочими CRUD-окнами
+- с нормальной обработкой ошибок
