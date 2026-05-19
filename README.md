@@ -1,6 +1,6 @@
-# Demo Exam Monorepo
 
-Монорепозиторий с подготовленными решениями демо-экзаменов по `.NET Framework 4.8`, `WPF`, `MSSQL` и `ADO.NET`.
+Подготовка
+Монорепозиторий `.NET Framework 4.8`, `WPF`, `MSSQL` и `ADO.NET`.
 
 ## Структура
 
